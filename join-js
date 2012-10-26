@@ -1,0 +1,52 @@
+#!/bin/bash
+
+# Join/compress JS
+# (c) 2012 Mikhail Yurasov
+# Usage: join-js input_html_file base_dir
+
+# options parsing
+
+exclude="all.js"
+yuicompressor=`locate yuicompressor | egrep "yuicompressor-\d\.\d\.\d\.jar" | rev | sort -r | rev | head -n 1`
+
+while getopts "me:" OPTION # m: for arg with options, value is stored in $OPTARG
+do
+    case $OPTION in
+    m)
+      minify="yes"
+    ;;
+    e)
+      exclude=$OPTARG
+    ;;
+    ?)
+      echo "Usage: $0 [-m] input_html_file base_dir"
+      exit 1
+    ;;
+    esac
+done
+
+shift $(($OPTIND-1))
+
+#
+
+# files
+files=$(cat $1 | grep "src=" | grep -v "${exclude}" | sed "s/^.*src=[\\\"\\\']//g" | sed "s/\\.js.*$/.js/g")
+
+base_dir=$2
+
+rm -f ___js___
+
+for f in $files
+do
+  path="${base_dir}/$f"
+  cat $path >> ___js___
+  echo ";" >> ___js___ # for history.native.js
+done
+
+if [ "$minify" = "yes" ]; then
+  cat ___js___  | java -jar $yuicompressor --type js
+else
+  cat ___js___
+fi
+
+rm -f ___js___
