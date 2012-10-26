@@ -4,10 +4,10 @@
 # (c) 2012 Mikhail Yurasov
 # Usage: join-js input_html_file base_dir
 
-# options parsing
-
 exclude="all.js"
 yuicompressor=`locate yuicompressor | egrep "yuicompressor-\d\.\d\.\d\.jar" | rev | sort -r | rev | head -n 1`
+
+# options parsing
 
 while getopts "me:" OPTION # m: for arg with options, value is stored in $OPTARG
 do
